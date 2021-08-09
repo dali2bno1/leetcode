@@ -1968,3 +1968,327 @@ class Solution:
         return points[0:k]
 
 ########################################################################################
+545. Boundary of Binary Tree
+Medium
+
+844
+
+1404
+
+Add to List
+
+Share
+The boundary of a binary tree is the concatenation of the root, the left boundary, the leaves ordered from left-to-right, and the reverse order of the right boundary.
+
+The left boundary is the set of nodes defined by the following:
+
+The root node's left child is in the left boundary. If the root does not have a left child, then the left boundary is empty.
+If a node in the left boundary and has a left child, then the left child is in the left boundary.
+If a node is in the left boundary, has no left child, but has a right child, then the right child is in the left boundary.
+The leftmost leaf is not in the left boundary.
+The right boundary is similar to the left boundary, except it is the right side of the root's right subtree. Again, the leaf is not part of the right boundary, and the right boundary is empty if the root does not have a right child.
+
+The leaves are nodes that do not have any children. For this problem, the root is not a leaf.
+
+Given the root of a binary tree, return the values of its boundary.
+
+
+
+Example 1:
+
+
+Input: root = [1,null,2,3,4]
+Output: [1,3,4,2]
+Explanation:
+- The left boundary is empty because the root does not have a left child.
+- The right boundary follows the path starting from the root's right child 2 -> 4.
+  4 is a leaf, so the right boundary is [2].
+- The leaves from left to right are [3,4].
+Concatenating everything results in [1] + [] + [3,4] + [2] = [1,3,4,2].
+Example 2:
+
+
+Input: root = [1,2,3,4,5,6,null,null,null,7,8,9,10]
+Output: [1,2,4,7,8,9,10,6,3]
+Explanation:
+- The left boundary follows the path starting from the root's left child 2 -> 4.
+  4 is a leaf, so the left boundary is [2].
+- The right boundary follows the path starting from the root's right child 3 -> 6 -> 10.
+  10 is a leaf, so the right boundary is [3,6], and in reverse order is [6,3].
+- The leaves from left to right are [4,7,8,9,10].
+Concatenating everything results in [1] + [2] + [4,7,8,9,10] + [6,3] = [1,2,4,7,8,9,10,6,3].
+
+
+Constraints:
+
+The number of nodes in the tree is in the range [1, 104].
+-1000 <= Node.val <= 1000
+
+
+class Solution:
+    def __init__(self):
+        self.result = []
+
+    def boundaryLeft(self,node):
+        if not node:
+            return
+        if node.left:
+            self.result.append(node.val)
+            self.boundaryLeft(node.left)
+        elif node.right:
+            self.result.append(node.val)
+            self.boundaryLeft(node.right)
+
+    def boundaryLeaves(self,node):
+        if not node:
+            return
+        self.boundaryLeaves(node.left)
+        if not node.left and not node.right:
+            self.result.append(node.val)
+        self.boundaryLeaves(node.right)
+
+    def boundaryRight(self,node):
+        if not node:
+            return
+        if node.right:
+            self.boundaryRight(node.right)
+            self.result.append(node.val)
+        elif node.left:
+            self.boundaryRight(node.left)
+            self.result.append(node.val)
+
+
+    def boundaryOfBinaryTree(self, root: TreeNode) -> List[int]:
+        if root:
+            self.result.append(root.val)
+            self.boundaryLeft(root.left)
+            self.boundaryLeaves(root.left)
+            self.boundaryLeaves(root.right)
+            self.boundaryRight(root.right)
+        return self.result
+
+########################################################################################
+849. Maximize Distance to Closest Person
+Medium
+
+1489
+
+137
+
+Add to List
+
+Share
+You are given an array representing a row of seats where seats[i] = 1 represents a person sitting in the ith seat, and seats[i] = 0 represents that the ith seat is empty (0-indexed).
+
+There is at least one empty seat, and at least one person sitting.
+
+Alex wants to sit in the seat such that the distance between him and the closest person to him is maximized.
+
+Return that maximum distance to the closest person.
+
+
+
+Example 1:
+
+
+Input: seats = [1,0,0,0,1,0,1]
+Output: 2
+Explanation:
+If Alex sits in the second open seat (i.e. seats[2]), then the closest person has distance 2.
+If Alex sits in any other open seat, the closest person has distance 1.
+Thus, the maximum distance to the closest person is 2.
+Example 2:
+
+Input: seats = [1,0,0,0]
+Output: 3
+Explanation:
+If Alex sits in the last seat (i.e. seats[3]), the closest person is 3 seats away.
+This is the maximum distance possible, so the answer is 3.
+Example 3:
+
+Input: seats = [0,1]
+Output: 1
+
+
+Constraints:
+
+2 <= seats.length <= 2 * 104
+seats[i] is 0 or 1.
+At least one seat is empty.
+At least one seat is occupied.
+
+
+class Solution:
+    def maxDistToClosest(self, seats: List[int]) -> int:
+        exists = [i for i in range(len(seats)) if seats[i]]
+        diffs = [exists[i+1]-exists[i] for i in range(len(exists)-1)] if len(exists) > 1 else [0]
+        return max(max(diffs)//2, exists[0], len(seats)-1-exists[-1])
+
+########################################################################################
+
+937. Reorder Data in Log Files
+Easy
+
+1236
+
+3163
+
+Add to List
+
+Share
+You are given an array of logs. Each log is a space-delimited string of words, where the first word is the identifier.
+
+There are two types of logs:
+
+Letter-logs: All words (except the identifier) consist of lowercase English letters.
+Digit-logs: All words (except the identifier) consist of digits.
+Reorder these logs so that:
+
+The letter-logs come before all digit-logs.
+The letter-logs are sorted lexicographically by their contents. If their contents are the same, then sort them lexicographically by their identifiers.
+The digit-logs maintain their relative ordering.
+Return the final order of the logs.
+
+
+
+Example 1:
+
+Input: logs = ["dig1 8 1 5 1","let1 art can","dig2 3 6","let2 own kit dig","let3 art zero"]
+Output: ["let1 art can","let3 art zero","let2 own kit dig","dig1 8 1 5 1","dig2 3 6"]
+Explanation:
+The letter-log contents are all different, so their ordering is "art can", "art zero", "own kit dig".
+The digit-logs have a relative order of "dig1 8 1 5 1", "dig2 3 6".
+Example 2:
+
+Input: logs = ["a1 9 2 3 1","g1 act car","zo4 4 7","ab1 off key dog","a8 act zoo"]
+Output: ["g1 act car","a8 act zoo","ab1 off key dog","a1 9 2 3 1","zo4 4 7"]
+
+
+Constraints:
+
+1 <= logs.length <= 100
+3 <= logs[i].length <= 100
+All the tokens of logs[i] are separated by a single space.
+logs[i] is guaranteed to have an identifier and at least one word after the identifier.
+
+
+class Solution:
+    def reorderLogFiles(self, logs: List[str]) -> List[str]:
+        letters=[]
+        digits=[]
+        for log in logs:
+            if log[-1].isdigit():
+                digits.append(log)
+            else:
+                letters.append(log)
+        letters = sorted(letters, key=lambda letter: (letter.split()[1:],letter.split()[0]))
+        return letters+digits
+
+########################################################################################
+1228. Missing Number In Arithmetic Progression
+Easy
+
+204
+
+25
+
+Add to List
+
+Share
+In some array arr, the values were in arithmetic progression: the values arr[i + 1] - arr[i] are all equal for every 0 <= i < arr.length - 1.
+
+A value from arr was removed that was not the first or last value in the array.
+
+Given arr, return the removed value.
+
+
+
+Example 1:
+
+Input: arr = [5,7,11,13]
+Output: 9
+Explanation: The previous array was [5,7,9,11,13].
+Example 2:
+
+Input: arr = [15,13,12]
+Output: 14
+Explanation: The previous array was [15,14,13,12].
+
+
+Constraints:
+
+3 <= arr.length <= 1000
+0 <= arr[i] <= 105
+The given array is guaranteed to be a valid array.
+
+
+class Solution:
+    def missingNumber(self, arr: List[int]) -> int:
+        len_arr = len(arr)
+        total_diff = arr[-1] - arr[0]
+        avg_diff = total_diff // len_arr
+
+        for i in range(len_arr-1):
+            if arr[i+1] - arr[i] != avg_diff:
+                return arr[i] + avg_diff
+        return arr[i] + avg_diff
+
+########################################################################################
+
+1200. Minimum Absolute Difference
+Easy
+
+729
+
+35
+
+Add to List
+
+Share
+Given an array of distinct integers arr, find all pairs of elements with the minimum absolute difference of any two elements.
+
+Return a list of pairs in ascending order(with respect to pairs), each pair [a, b] follows
+
+a, b are from arr
+a < b
+b - a equals to the minimum absolute difference of any two elements in arr
+
+
+Example 1:
+
+Input: arr = [4,2,1,3]
+Output: [[1,2],[2,3],[3,4]]
+Explanation: The minimum absolute difference is 1. List all pairs with difference equal to 1 in ascending order.
+Example 2:
+
+Input: arr = [1,3,6,10,15]
+Output: [[1,3]]
+Example 3:
+
+Input: arr = [3,8,-10,23,19,-4,-14,27]
+Output: [[-14,-10],[19,23],[23,27]]
+
+
+Constraints:
+
+2 <= arr.length <= 10^5
+-10^6 <= arr[i] <= 10^6
+
+
+class Solution:
+    def minimumAbsDifference(self, arr: List[int]) -> List[List[int]]:
+        result = []
+        min_diff = float('inf')
+        len_arr = len(arr)
+        arr.sort()
+
+        for i in range(len_arr-1):
+            curr_diff = arr[i+1] - arr[i]
+            if curr_diff < min_diff:
+                result = [[arr[i], arr[i+1]]]
+                min_diff = curr_diff
+            elif curr_diff == min_diff:
+                result.append([arr[i], arr[i+1]])
+        return result
+
+########################################################################################
